@@ -7,8 +7,8 @@ LIB=lib
 ALL: directory lib main
 
 directory:
-	mkdir $(BIN)
-	mkdir $(LIB)
+	mkdir -p $(BIN)
+	mkdir -p $(LIB)
 
 lib: object
 	gcc -shared $(BIN)/lib_swift.o -o $(LIB)/libswift.so
