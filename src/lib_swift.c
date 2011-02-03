@@ -73,8 +73,11 @@ Swift socketSwift()
 	Dprintf("create swift socket");	
 	Swift s = calloc(1,sizeof(*s));
 
-	Dprintf("create swift listener");	
+	Dprintf("create swift socket listener");	
 	CHECK(s->socketListener = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP));
+
+	Dprintf("create swift socket data");	
+	CHECK(s->socketData = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP));
 
 	memset((char *) &s->socketListenerAddr, 0, sizeof(s->socketListenerAddr));
 	
@@ -92,3 +95,5 @@ void closeSwift(Swift s)
 	
 	free(s);
 }
+
+
