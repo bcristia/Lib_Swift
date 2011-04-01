@@ -2,4 +2,7 @@
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:lib
 
-./bin/main $*
+./bin/server &
+./bin/client &
+
+

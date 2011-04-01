@@ -22,15 +22,19 @@
 	} while (0) \
 
 #ifdef DEBUG
-#define Dprintf(msg,...) printf("[%s]:%d" msg, __FILE__, __LINE__, ##__VA_ARGS__)
+#define Dprintf(msg,...) printf("[%s]:%d " msg, __FILE__, __LINE__, ##__VA_ARGS__)
 #else
 #define Dprintf(msg,...)                /* do nothing */
 #endif
 
 // swift interface
 typedef struct swift {
-	int socketListener, socketData;
-	struct sockaddr_in socketListenerAddr;
+	int socketListener;
+	int sendChannel;
+	int *recvChannel;
+	
+	int usedChannels;
+	int maxChannels;
 } *Swift;
 
 // swift_addr structure similar with in_addr 
@@ -53,7 +57,7 @@ struct listsockaddr {
 };	
 
 // Function to create a Swift socket
-Swift socketSwift();
+Swift socketSwift(int maxChannels);
 
 // Function to close a Swift socket
 void closeSwift(Swift);
@@ -66,11 +70,16 @@ int listenfromSwift (Swift s, void *buf, size_t len, int flags,
 int bindSwift(Swift s, const struct sockSwiftaddr *my_addr, socklen_t addrlen);
 
 // Function to receive a message
-ssize_t recvfrom(Swift s, void *buf, size_t len, int flags,
-                 struct sockSwiftaddr *from, socklen_t *fromlen);
+ssize_t recvfromSwift(Swift s, void *buf, size_t len, int flags,
+                 struct sockSwiftaddr *from, socklen_t fromlen);
                  
 // Function to send a message
-ssize_t sendto(Swift s, const void *buf, size_t len, int flags, 
-				const struct sockSwiftaddr *to, socklen_t tolen);
+ssize_t sendToSwift(Swift s, const void *buf, size_t len, int flags, 
+					const struct sockSwiftaddr *to, socklen_t tolen);
+
+
+// test function -- don't commit
+struct sockSwiftaddr transformFromAddrToSwift(struct listsockaddr lsa);
+struct listsockaddr transformFromSwiftToAddr(struct sockSwiftaddr ssa);
 
 #endif
