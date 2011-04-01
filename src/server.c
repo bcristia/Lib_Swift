@@ -15,6 +15,7 @@ int main()
 	char buf[100];
 	socklen_t slen;
 	struct listsockaddr lsa;
+	ssize_t len;
 	
 	// populate sockSwiftaddr
 	my_addr.sin_family = AF_INET;
@@ -25,11 +26,11 @@ int main()
 	//recvfromSwift(s, buf, 100, 0, (struct sockaddr *)&si_other, &slen);
 	
 	bindSwift(s, &my_addr, sizeof(my_addr));
-	listenfromSwift(s, buf, 100, 0, &from, &slen);
+	len = listenfromSwift(s, buf, 100, 0, &from, &slen);
+	transformFromSwiftToAddr(&lsa, from);
+	printf("Received packet from %s:%d with data: %s %d\n", inet_ntoa(lsa.sa[0].sin_addr), ntohs(lsa.sa[0].sin_port), buf, (int)len);
 	
-	lsa =  transformFromSwiftToAddr(from);
-	printf("Received packet from %s:%d with data: %s\n", inet_ntoa(lsa.sa[0].sin_addr), ntohs(lsa.sa[0].sin_port), buf);
-	
+	sendToSwift(s, buf, len, 0, &from, slen);
 	
 	closeSwift(s);
 	return 0;

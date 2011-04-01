@@ -27,11 +27,13 @@
 #define Dprintf(msg,...)                /* do nothing */
 #endif
 
+typedef int SOCKET;
+
 // swift interface
 typedef struct swift {
-	int socketListener;
-	int sendChannel;
-	int *recvChannel;
+	SOCKET socketListener;
+	SOCKET sendChannel;
+	SOCKET *recvChannel;
 	
 	int usedChannels;
 	int maxChannels;
@@ -79,7 +81,7 @@ ssize_t sendToSwift(Swift s, const void *buf, size_t len, int flags,
 
 
 // test function -- don't commit
-struct sockSwiftaddr transformFromAddrToSwift(struct listsockaddr lsa);
-struct listsockaddr transformFromSwiftToAddr(struct sockSwiftaddr ssa);
+void transformFromAddrToSwift(struct sockSwiftaddr *ssa, struct listsockaddr lsa);
+void transformFromSwiftToAddr(struct listsockaddr *lsa, struct sockSwiftaddr ssa);
 
 #endif

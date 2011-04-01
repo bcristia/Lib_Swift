@@ -13,6 +13,7 @@ int main()
 	Swift s = socketSwift(1);
 	struct sockSwiftaddr my_addr;
 	char buf[100];
+	struct listsockaddr lsa;
 	
 	// populate sockSwiftaddr
 	my_addr.sin_family = AF_INET;
@@ -22,7 +23,7 @@ int main()
 	
 	recvfromSwift(s, buf, 100, 0, &my_addr, sizeof(my_addr));
 	
-	struct listsockaddr lsa =  transformFromSwiftToAddr(my_addr);
+	transformFromSwiftToAddr(&lsa, my_addr);
 	printf("Received packet from %s:%d\nData: %s\n\n", inet_ntoa(lsa.sa[0].sin_addr), ntohs(my_addr.sin_port), buf);
 	
 	closeSwift(s);
