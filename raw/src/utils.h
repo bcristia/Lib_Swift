@@ -1,3 +1,12 @@
+/*
+ *  utils.h
+ *  
+ *
+ *  Created by Bogdan Drutu on 5/3/11.
+ *  Copyright 2011 UPB. All rights reserved.
+ *
+ */
+
 #ifndef __UTILS__
 
 #define __UTILS__
@@ -10,14 +19,12 @@
     exit(EXIT_FAILURE); \
   } while (0) \
 
-#define CHECK(x) \
+#define CHECK(x, s) \
   do \
   { \
-    if (!(x)) \
+    if (x) \
     { \
-      printf("%s:%d: ", __func__, __LINE__); \
-      perror(#x); \
-      exit(EXIT_FAILURE); \
+		DIE(s); \
     } \
   } while (0) \
 
