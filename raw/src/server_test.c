@@ -1,14 +1,16 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<sys/socket.h>
-#include<features.h>
-#include<linux/if_packet.h>
-#include<linux/if_ether.h>
-#include<errno.h>
-#include<sys/ioctl.h>
-#include<net/if.h>
-#include<linux/ip.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
+#include <sys/socket.h>
+#include <features.h>
+#include <linux/if_packet.h>
+#include <linux/if_ether.h>
+#include <errno.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <linux/ip.h>
+#include <netinet/in.h>
 
 int CreateRawSocket(int protocol_to_sniff)
 {
@@ -76,9 +78,9 @@ void PrintPacketInHex(unsigned char *packet, int len)
 }
 
 
-PrintInHex(char *mesg, unsigned char *p, int len)
+int PrintInHex(char *mesg, unsigned char *p, int len)
 {
-q	printf(mesg);
+	printf(mesg);
 
 	while(len--)
 	{
@@ -89,7 +91,7 @@ q	printf(mesg);
 }
 
 
-ParseEthernetHeader(unsigned char *packet, int len)
+void ParseEthernetHeader(unsigned char *packet, int len)
 {
 	struct ethhdr *ethernet_header;
 
@@ -120,7 +122,7 @@ ParseEthernetHeader(unsigned char *packet, int len)
 	}
 }
 
-ParseIpHeader(unsigned char *packet, int len)
+void ParseIpHeader(unsigned char *packet, int len)
 {
 	struct ethhdr *ethernet_header;
 	struct iphdr *ip_header;
@@ -159,7 +161,7 @@ ParseIpHeader(unsigned char *packet, int len)
 }
 
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	int raw;
 	unsigned char packet_buffer[2048]; 
@@ -204,7 +206,6 @@ main(int argc, char **argv)
 			ParseIpHeader(packet_buffer, len);
 		}
 	}
-	
 	
 	return 0;
 }
