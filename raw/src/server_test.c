@@ -35,8 +35,6 @@ int BindRawSocketToInterface(char *device, int rawsock, int protocol)
 	bzero(&ifr, sizeof(ifr));
 	
 	/* First Get the Interface Index  */
-
-
 	strncpy((char *)ifr.ifr_name, device, IFNAMSIZ);
 	if((ioctl(rawsock, SIOCGIFINDEX, &ifr)) == -1)
 	{
@@ -45,11 +43,9 @@ int BindRawSocketToInterface(char *device, int rawsock, int protocol)
 	}
 
 	/* Bind our raw socket to this interface */
-
 	sll.sll_family = AF_PACKET;
 	sll.sll_ifindex = ifr.ifr_ifindex;
 	sll.sll_protocol = htons(protocol); 
-
 
 	if((bind(rawsock, (struct sockaddr *)&sll, sizeof(sll)))== -1)
 	{
@@ -95,22 +91,21 @@ void ParseEthernetHeader(unsigned char *packet, int len)
 {
 	struct ethhdr *ethernet_header;
 
+	printf("\n---------ETHERNET HEADER----\n");
+
 	if(len > sizeof(struct ethhdr))
 	{
 		ethernet_header = (struct ethhdr *)packet;
 
 		/* First set of 6 bytes are Destination MAC */
-
 		PrintInHex("Destination MAC: ", ethernet_header->h_dest, 6);
 		printf("\n");
 		
 		/* Second set of 6 bytes are Source MAC */
-
 		PrintInHex("Source MAC: ", ethernet_header->h_source, 6);
 		printf("\n");
 
 		/* Last 2 bytes in the Ethernet header are the protocol it carries */
-
 		PrintInHex("Protocol: ",(void *)&ethernet_header->h_proto, 2);
 		printf("\n");
 
@@ -129,21 +124,23 @@ void ParseIpHeader(unsigned char *packet, int len)
 
 	/* First Check if the packet contains an IP header using
 	   the Ethernet header                                */
-
 	ethernet_header = (struct ethhdr *)packet;
+
+	printf("\n---------IP HEADER----\n");
 
 	if(ntohs(ethernet_header->h_proto) == ETH_P_IP)
 	{
 		/* The IP header is after the Ethernet header  */
-		
 		if(len >= (sizeof(struct ethhdr) + sizeof(struct iphdr)))
 		{
 			ip_header = (struct iphdr*)(packet + sizeof(struct ethhdr));
 			
 			/* print the Source and Destination IP address */
+			char * src_ip = (char *)inet_ntoa(ip_header->saddr);
+			char * dst_ip = (char *)inet_ntoa(ip_header->daddr);
 
-			printf("Dest IP address: %s\n", inet_ntoa(ip_header->daddr));
-			printf("Source IP address: %s\n", inet_ntoa(ip_header->saddr));
+			printf("Dest IP address: %lx\n", dst_ip);
+			printf("Source IP address: %lx\n", src_ip);
 			printf("TTL = %d\n", ip_header->ttl);	
 
 		}
@@ -171,22 +168,18 @@ int main(int argc, char **argv)
 	int packet_info_size = sizeof(packet_info_size);
 
 	/* create the raw socket */
-
 	raw = CreateRawSocket(ETH_P_IP);
 
 	/* Bind socket to interface */
-
 	BindRawSocketToInterface(argv[1], raw, ETH_P_IP);
 
 	/* Get number of packets to sniff from user */
-
 	packets_to_sniff = atoi(argv[2]);
 
 	/* Start Sniffing and print Hex of every packet */
-	
 	while(packets_to_sniff--)
 	{
-		if((len = recvfrom(raw, packet_buffer, 2048, 0, (struct sockaddr*)&packet_info, &packet_info_size)) == -1)
+		if((len = recvfrom(raw, packet_buffer, 4096, 0, (struct sockaddr*)&packet_info, &packet_info_size)) == -1)
 		{
 			perror("Recv from returned -1: ");
 			exit(-1);
@@ -194,15 +187,12 @@ int main(int argc, char **argv)
 		else
 		{
 			/* Packet has been received successfully !! */
-
 			PrintPacketInHex(packet_buffer, len);
 
 			/* Parse Ethernet Header */
-			
 			ParseEthernetHeader(packet_buffer, len);
 			
 			/* Parse IP Header */
-
 			ParseIpHeader(packet_buffer, len);
 		}
 	}
