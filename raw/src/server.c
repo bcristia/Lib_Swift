@@ -31,15 +31,35 @@ int main(int argc, char *argv[])
 	char buffer[SWIFT_PCKT_LEN];
 	
 	// Destination addresses: IP and port
-	struct sockaddr_in din;
+	struct sockaddr_in sin, din;
 	// Destination length
 	socklen_t len;
-		
+
+	if(argc != 3)
+	{
+		fprintf(stderr,"- Usage %s <target hostname/IP> <target port>\n", argv[0]);
+		DIE("Invalid parameters!!!\n");
+	}
+	
+	
+	// The source is redundant, may be used later if needed
+	// The address family
+	sin.sin_family = AF_INET;
+	
+	// Port numbers
+	sin.sin_port = htons(atoi(argv[2]));
+
+	// IP addresses
+	sin.sin_addr.s_addr = inet_addr(argv[1]);
+	
 	// Create a raw socket with UDP protocol
 	socket_raw = socket(PF_INET, SOCK_RAW, IPPROTO_UDP);
 	CHECK(socket_raw < 0, "socket() error");
 	
-	while (1)
+	// Bind socket
+	CHECK(bind(socket_raw, (struct sockaddr *) &sin, sizeof(sin)) == -1,"bind");
+
+ 	while (1)
 	{
 		memset(buffer, 0, SWIFT_PCKT_LEN);
 		

@@ -5,7 +5,7 @@ BIN=bin
 SRC=src
 LIB=lib
 
-ALL: directory $(LIB)/libswiftraw.so $(BIN)/server $(BIN)/client
+ALL: directory $(LIB)/libswiftraw.so $(BIN)/server $(BIN)/client $(BIN)/server_test
 
 directory:
 	mkdir -p $(BIN)
@@ -18,6 +18,9 @@ $(BIN)/client: $(SRC)/client.c
 	$(CC) $(CFLAGS) -o $@ $^ -lswiftraw -L$(LIB)
 
 $(BIN)/server: $(SRC)/server.c
+	$(CC) $(CFLAGS) -o $@ $^ -lswiftraw -L$(LIB)
+
+$(BIN)/server_test: $(SRC)/server_test.c
 	$(CC) $(CFLAGS) -o $@ $^ -lswiftraw -L$(LIB)
 
 $(BIN)/lib_swift_raw.o: $(SRC)/lib_swift_raw.c
